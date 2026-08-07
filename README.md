@@ -111,24 +111,20 @@ streamlit run frontend/app.py
    - Add credits so the LLM analysis layer can actually run for the demo
    - Test end-to-end once resolved: `streamlit run frontend/app.py`, upload a notebook from `test_notebooks/`, confirm flags appear
 
-2. **Curate more test notebooks**
-   - Add 2-3 more notebooks to `test_notebooks/` — a mix of clean and deliberately messy ones
-   - Consider hand-editing one notebook to introduce an obvious narrative flaw for a guaranteed demo "gotcha" moment
-
-3. **QA the whole pipeline**
+2. **QA the whole pipeline**
    - Try uploading different notebooks and check for bugs, crashes, or confusing UI moments
    - Report any issues found to the team
 
-4. **Write project documentation**
+3. **Write project documentation**
    - Problem statement, approach, architecture overview (parser → LLM analysis → frontend)
    - Known limitations (e.g. LLM judgment isn't ground truth, notebook-only scope for now)
    - Future vision (extending to pentest reports/postmortems)
 
-5. **Fill the official PPT template**
+4. **Fill the official PPT template**
    - Embed: Project Documentation link, GitHub Repository link, Working Demo link
    - Optional but recommended: record a short YouTube video explaining the problem, solution, and impact — embed link in PPT
 
-6. **Prepare demo script**
+5. **Prepare demo script**
    - Pick a messy notebook to show live
    - Script the "gotcha" moment (e.g. "Cell 14 computes feature importances but it's never used again")
    - Rehearse timing so the live demo is smooth
