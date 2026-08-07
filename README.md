@@ -77,111 +77,60 @@ Tested on real Kaggle notebooks in `test_notebooks/`.
 
 ---
 
-### 🔜 Next Up — Frontend / Demo Interface (Person 3)
+### ✅ Completed — Frontend / Demo Interface (Person 3)
 
-**Goal:** Build a Streamlit web app that ties the whole pipeline together and displays results visually to judges.
+**What's done:**
+- `frontend/app.py` — a full Streamlit web app that ties the entire pipeline together
+- File upload widget for `.ipynb` files
+- Runs the full pipeline on upload: `get_notebook_analysis()` → `analyze_notebook()` → `compute_narrative_debt_score()`
+- Displays the narrative debt score prominently with color coding (green/yellow/red)
+- Cell-by-cell view: every cell shown with color-coded severity based on flag count
+- Flag summary view: all flags grouped by issue type
+- Expandable explanations for each flagged cell
+- Graceful error handling for missing API keys and pipeline import issues
 
-**What to build:**
+**Confirmed working:** UI renders correctly, file upload works, pipeline integration is wired correctly end-to-end.
 
-1. **File upload interface**
-   - A file upload widget that accepts `.ipynb` files
-   - Show a loading indicator while processing
+**Known blocker (non-code issue):** Anthropic API credit balance needs to be topped up before live testing/demo — this is a billing setup step, not a bug.
 
-2. **End-to-end pipeline call**
-```python
-   from parser.parse_notebook import get_notebook_analysis
-   from llm_analysis.analyze import analyze_notebook, compute_narrative_debt_score
-
-   notebook_data = get_notebook_analysis(uploaded_notebook_path)
-   flags = analyze_notebook(notebook_data)
-   score = compute_narrative_debt_score(flags, notebook_data)
-```
-
-3. **Display the narrative debt score prominently**
-   - Show as a large metric/number at the top (e.g. "Narrative Debt Score: 45/100")
-   - Color code: green for low scores (0-30), yellow for medium (30-70), red for high (70-100)
-
-4. **Cell-by-cell display**
-   - Show every cell from the notebook in order (code and markdown)
-   - Color code cells:
-     - **Green** — no flags reference this cell
-     - **Yellow** — 1-2 flags
-     - **Red** — 3+ flags
-   - Clicking or hovering a flagged cell shows its `explanation`
-
-5. **Flag summary section**
-   - List all flags with their `cell_index`, `issue_type`, and `explanation`
-   - Grouped by issue type or by severity for readability
-
-6. **Test it locally**
-   - Use notebooks from `test_notebooks/` to verify the UI works
-   - Make sure the flow is smooth: upload → process → display results
-
-**Tech stack:**
-- Streamlit for the web interface (already in `requirements.txt`)
-- Python (call your existing parser/analyzer functions directly)
-
-**Deliverable:** `frontend/app.py` — runnable with:
+**Run it:**
 ```bash
 streamlit run frontend/app.py
 ```
 
-**Demo script for judges:**
-1. Upload a deliberately messy Kaggle notebook
-2. Show the narrative debt score light up
-3. Click on a flagged cell to show its specific issue
-4. Demonstrate how a clean notebook scores low
-5. Highlight one "gotcha" moment (e.g. a cell that computes something important but is never referenced again)
-
 ---
 
-## Tech Stack
+### 🔜 Next Up — Docs, Testing & Submission (Person 4)
 
-- **Parser:** Python, `ast` module, `json`
-- **LLM Analysis:** Claude API (Anthropic), `anthropic` SDK
-- **Frontend:** Streamlit
-- **Version Control:** GitHub
-- **Testing:** Notebooks in `test_notebooks/`
+**Goal:** Get everything ready for the final submission — polish, test, document, and package.
 
-## Setup & Installation
+**What to do:**
 
-1. Clone the repo and activate the venv:
-```bash
-   git clone <repo-url>
-   cd plothole
-   python -m venv venv
-   venv\Scripts\Activate.ps1  # Windows
-   source venv/bin/activate   # Mac/Linux
-```
+1. **Add Anthropic API credits** (blocking item)
+   - Go to console.anthropic.com → Plans & Billing
+   - Add credits so the LLM analysis layer can actually run for the demo
+   - Test end-to-end once resolved: `streamlit run frontend/app.py`, upload a notebook from `test_notebooks/`, confirm flags appear
 
-2. Install dependencies:
-```bash
-   pip install -r requirements.txt
-```
+2. **Curate more test notebooks**
+   - Add 2-3 more notebooks to `test_notebooks/` — a mix of clean and deliberately messy ones
+   - Consider hand-editing one notebook to introduce an obvious narrative flaw for a guaranteed demo "gotcha" moment
 
-3. Set your Anthropic API key (for testing the LLM layer):
-```bash
-   $env:ANTHROPIC_API_KEY="sk-ant-..."  # Windows PowerShell
-   export ANTHROPIC_API_KEY="sk-ant-..." # Mac/Linux
-```
+3. **QA the whole pipeline**
+   - Try uploading different notebooks and check for bugs, crashes, or confusing UI moments
+   - Report any issues found to the team
 
-4. Run the frontend:
-```bash
-   streamlit run frontend/app.py
-```
+4. **Write project documentation**
+   - Problem statement, approach, architecture overview (parser → LLM analysis → frontend)
+   - Known limitations (e.g. LLM judgment isn't ground truth, notebook-only scope for now)
+   - Future vision (extending to pentest reports/postmortems)
 
----
+5. **Fill the official PPT template**
+   - Embed: Project Documentation link, GitHub Repository link, Working Demo link
+   - Optional but recommended: record a short YouTube video explaining the problem, solution, and impact — embed link in PPT
 
-## Submission Deadline
+6. **Prepare demo script**
+   - Pick a messy notebook to show live
+   - Script the "gotcha" moment (e.g. "Cell 14 computes feature importances but it's never used again")
+   - Rehearse timing so the live demo is smooth
 
-**August 12, 2026 (11:59 PM IST)**
-
-Submissions evaluated on a rolling basis — **submit early for earlier results.**
-
----
-
-## Next Steps
-
-1. **Person 3:** Build the Streamlit frontend (see "Next Up" section above)
-2. **Person 4:** Finalize docs, prepare submission PPT with links, record demo video
-3. **All:** Test end-to-end once frontend is ready, iterate on UX before final push
+**Deliverable:** Final PPT submitted via the official template, before **August 12, 2026, 11:59 PM IST**. Remember: rolling evaluation means earlier submission = earlier results.
