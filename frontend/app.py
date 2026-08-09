@@ -10,7 +10,16 @@ import streamlit as st
 import tempfile
 import os
 import json
+import sys
 from collections import defaultdict
+
+# ---------------------------------------------------------------------------
+# Make sure the project root (parent of this file's folder) is importable,
+# since Streamlit only adds this file's own folder to sys.path by default.
+# ---------------------------------------------------------------------------
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 # ---------------------------------------------------------------------------
 # Pipeline imports (Person 1 + Person 2's modules)
@@ -168,8 +177,8 @@ with st.sidebar:
             "root so `parser/` and `llm_analysis/` are importable.\n\n"
             f"Import error: {PIPELINE_IMPORT_ERROR}"
         )
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        st.warning("ANTHROPIC_API_KEY is not set — the LLM analysis step will fail.")
+    if not os.environ.get("GROQ_API_KEY"):
+        st.warning("GROQ_API_KEY is not set — the LLM analysis step will fail.")
 
 
 # ---------------------------------------------------------------------------

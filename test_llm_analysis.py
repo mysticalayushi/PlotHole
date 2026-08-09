@@ -3,7 +3,7 @@ Quick harness for iterating on the narrative-debt prompt.
 
 Drop this file in the repo root (next to parser/ and test_notebooks/) and run:
 
-    export ANTHROPIC_API_KEY=sk-ant-...
+    export GROQ_API_KEY=gsk_...
     python test_llm_analysis.py test_notebooks/some_notebook.ipynb
 
 Or with no args, it'll run against every .ipynb in test_notebooks/.

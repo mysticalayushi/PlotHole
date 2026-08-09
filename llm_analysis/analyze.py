@@ -12,16 +12,17 @@ Usage:
     score = compute_narrative_debt_score(flags, notebook_data)
 
 Requires:
-    pip install anthropic
-    export ANTHROPIC_API_KEY=sk-ant-...
+    pip install openai
+    export GROQ_API_KEY=gsk_...
 """
 
 import os
 import json
 import re
-from anthropic import Anthropic
+from openai import OpenAI
 
-DEFAULT_MODEL = "claude-sonnet-4-5-20250929"
+DEFAULT_MODEL = "llama-3.3-70b-versatile"
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 VALID_ISSUE_TYPES = {
     "orphaned_exploration",
@@ -232,18 +233,21 @@ MECHANICALLY-DETECTED DEAD-END VARIABLES:
 Review this notebook and return the JSON array of narrative debt flags now."""
 
     if client is None:
-        client = Anthropic(api_key=api_key or os.environ.get("ANTHROPIC_API_KEY"))
+        client = OpenAI(
+            api_key=api_key or os.environ.get("GROQ_API_KEY"),
+            base_url=GROQ_BASE_URL,
+        )
 
-    response = client.messages.create(
+    response = client.chat.completions.create(
         model=model,
         max_tokens=max_tokens,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_prompt}],
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt},
+        ],
     )
 
-    raw_text = "".join(
-        block.text for block in response.content if getattr(block, "type", None) == "text"
-    )
+    raw_text = response.choices[0].message.content or ""
 
     try:
         raw_flags = _extract_json_array(raw_text)
