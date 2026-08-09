@@ -155,12 +155,12 @@ streamlit run frontend/app.py
 | Parser, narrative graph & live demo(`parser/`) | Ayushi Rai | [@mysticalayushi](https://github.com/mysticalayushi) |
 | LLM analysis & scoring (`llm_analysis/`) | Harshit Mishra | [@harshitmishra-dev](https://github.com/harshitmishra-dev) |
 | Streamlit frontend (`frontend/`) | Kalash Sharma| [@Kalash-here](https://github.com/Kalash-here) |
-| Documentation, testing & submission | Gunjan Sharma | [gunzzzz04](https://github.com/gunzzzz04) |
+| Documentation, testing & submission | Gunjan Sharma | [@gunzzzz04](https://github.com/gunzzzz04) |
 
 ---
 
 ## 10. Links
 
 - **GitHub repo:** https://github.com/mysticalayushi/plothole
-- **Working demo:** _add link_
-- **YouTube video:** _add link_
+- **Working demo:** coming soon
+- **YouTube video:** coming soon
