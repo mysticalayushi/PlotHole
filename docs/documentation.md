@@ -1,6 +1,8 @@
 # PlotHole
 ### Catching narrative debt in Jupyter notebooks before it reaches review
 
+**Team: DataForge** · Built for BRAINWAVE 2026
+
 ---
 
 ## 1. Project Overview
@@ -10,7 +12,7 @@
 
 **Problem statement addressed:** Open Innovation / Problem Statement 3
 
-**The problem, in plain language:**
+**The problem - in plain language:**
 Jupyter notebooks are supposed to tell a story — explore data, test an idea, show evidence, reach a conclusion. In practice, that story rots fast: cells get run out of order, dead-end explorations get left in, and the final conclusion often claims things the actual cell outputs never proved. Existing linters check whether code *runs*, not whether the notebook still makes *sense*. PlotHole reads a notebook the way a skeptical reviewer would, and tells you exactly where the narrative breaks down.
 
 ---
@@ -43,41 +45,45 @@ PlotHole parses a notebook, builds a map of every variable's life story across c
 - An overall **narrative debt score** for the notebook (flags relative to number of code cells)
 - A **cell-by-cell list of flags**, each with the cell index, issue type, and a plain-language explanation of what's wrong — shown in the Streamlit frontend so a user can jump straight to the problem cell.
 
+> **Note:** because the score depends on LLM judgment rather than a fixed rule set, the exact number can vary slightly between runs on the same notebook. The relative pattern — which notebooks get flagged, and roughly how severely — has stayed consistent across repeated testing.
+
 ---
 
 ## 4. Architecture / How It Works
 
 **Pipeline:** `Notebook (.ipynb)` → **Parser** → **LLM Analysis** → **Frontend**
-.ipynb file
-│
-▼
-┌─────────────────┐
-│ Parser │ ast-based extraction of cells, variables,
-│ (Person 1) │ and a cross-cell "narrative graph"
-└─────────────────┘
-│ structured dict (cells + narrative_graph)
-▼
-┌─────────────────┐
-│ LLM Analysis │ Claude API reasons over cells + dead-end
-│ (Person 2) │ variables, returns structured JSON flags
-└─────────────────┘
-│ list of flags + narrative debt score
-▼
-┌─────────────────┐
-│ Frontend │ Streamlit app: upload a notebook, see
-│ (Person 3) │ score + flagged cells
-└─────────────────┘
 
+```
+.ipynb file
+    │
+    ▼
+┌─────────────────┐
+│     Parser       │  ast-based extraction of cells, variables,
+│  (parser/)        │  and a cross-cell "narrative graph"
+└─────────────────┘
+    │ structured dict (cells + narrative_graph)
+    ▼
+┌─────────────────┐
+│  LLM Analysis     │  Llama 3.3 70B (via Groq API) reasons over
+│ (llm_analysis/)    │  cells + dead-end variables, returns
+└─────────────────┘  structured JSON flags
+    │ list of flags + narrative debt score
+    ▼
+┌─────────────────┐
+│    Frontend       │  Streamlit app: upload a notebook, see
+│  (frontend/)       │  score + flagged cells
+└─────────────────┘
+```
 
 **Component breakdown**
 
-- **Parser (Person 1)** — `parser/parse_notebook.py`. Reads any `.ipynb` file, extracts every cell (type, source, outputs), and for each code cell uses Python's `ast` module to determine which variables are **assigned** vs **used**. It then cross-references every cell to build a **narrative graph**: a per-variable history of where it was created and every later cell where it was used — which is how dead-end variables are detected. Exposed as a single function, `get_notebook_analysis(path)`.
+- **Parser** — `parser/parse_notebook.py`. Reads any `.ipynb` file, extracts every cell (type, source, outputs), and for each code cell uses Python's `ast` module to determine which variables are **assigned** vs **used**. It then cross-references every cell to build a **narrative graph**: a per-variable history of where it was created and every later cell where it was used — which is how dead-end variables are detected. Exposed as a single function, `get_notebook_analysis(path)`.
 
-- **LLM Analysis (Person 2)** — `llm_analysis/analyze.py`. Takes the parser's output dict and sends the cell contents, outputs, and the `dead_end_variables` list to Claude with a structured prompt asking it to identify the four issue types above. The LLM returns strict JSON (`cell_index`, `issue_type`, `explanation` per flag), and the function also computes the overall narrative debt score. Exposed as `analyze_notebook(notebook_data)`.
+- **LLM Analysis** — `llm_analysis/analyze.py`. Takes the parser's output dict and sends the cell contents, outputs, and the `dead_end_variables` list to an LLM (Llama 3.3 70B, via the Groq API) with a structured prompt asking it to identify the four issue types above. The model returns strict JSON (`cell_index`, `issue_type`, `explanation` per flag), and the function also computes the overall narrative debt score. Exposed as `analyze_notebook(notebook_data)`.
 
-- **Frontend (Person 3)** — Streamlit app that lets a user upload a `.ipynb` file, runs it through the parser and LLM analysis, and displays the narrative debt score alongside the flagged cells with their explanations.
+- **Frontend** — `frontend/app.py`. A Streamlit app that lets a user upload a `.ipynb` file, runs it through the parser and LLM analysis, and displays the narrative debt score alongside the flagged cells with their explanations.
 
-**Tech stack:** Python, `ast` module, Claude API, Streamlit
+**Tech stack:** Python, `ast` module, Groq API (Llama 3.3 70B), Streamlit
 
 ---
 
@@ -87,7 +93,7 @@ PlotHole parses a notebook, builds a map of every variable's life story across c
 
 - **Judgment deliberately left to the LLM, not hardcoded.** Rather than writing brittle heuristics to decide which dead-end variables "matter" (e.g. excluding loop variables or one-off prints), the raw `dead_end_variables` list is handed to the LLM alongside the cell context, and the LLM makes the call — because that distinction is genuinely a judgment call, not a rule.
 
-- **Strict JSON contract between backend and frontend.** The LLM is prompted to return only a structured JSON array (`cell_index`, `issue_type`, `explanation`), which decouples the analysis layer from the frontend completely — Person 3 never has to parse free-form LLM text, just validate and render JSON.
+- **Strict JSON contract between backend and frontend.** The LLM is prompted to return only a structured JSON array (`cell_index`, `issue_type`, `explanation`), which decouples the analysis layer from the frontend completely — the frontend never has to parse free-form LLM text, just validate and render JSON. Malformed responses are filtered out before they ever reach the UI, so a bad model response can't crash the app.
 
 - **Prompt iteration against real data.** The prompt was tuned against real Kaggle notebooks in `test_notebooks/` specifically to avoid being too strict (flagging normal exploratory work) or too lenient (missing genuine gaps) — the score is meant to be a signal for human review, not an automated verdict.
 
@@ -97,27 +103,36 @@ PlotHole parses a notebook, builds a map of every variable's life story across c
 
 **Setup (local):**
 ```bash
-git clone https://github.com/mysticalayushi/PlotHole.git
-cd PlotHole
+git clone https://github.com/mysticalayushi/plothole.git
+cd plothole
+
+python -m venv venv
+venv\Scripts\Activate.ps1      # Windows
+source venv/bin/activate       # Mac/Linux
+
 pip install -r requirements.txt
-# set your Claude API key as an environment variable, e.g.
-export ANTHROPIC_API_KEY=your_key_here
-streamlit run app.py
+
+# set your Groq API key as an environment variable
+$env:GROQ_API_KEY="gsk_..."     # Windows PowerShell
+export GROQ_API_KEY="gsk_..."   # Mac/Linux
+
+streamlit run frontend/app.py
 ```
 
 **What to try as a judge/user:**
 1. Launch the Streamlit app.
 2. Upload one of the sample notebooks from `test_notebooks/` (these are real Kaggle notebooks already known to contain narrative debt).
-3. Review the narrative debt score and click through the flagged cells to see the LLM's explanation for each one.
+3. Review the narrative debt score and click through the flagged cells to see the model's explanation for each one.
 4. Try uploading a clean, well-documented notebook for comparison and see the score drop.
 
 ---
 
 ## 7. Limitations & Honest Caveats
 
-- **LLM judgment isn't ground truth.** Every flag is a suggestion for a human reviewer, not a definitive verdict — the LLM can misjudge context, especially in domain-specific notebooks.
+- **LLM judgment isn't ground truth.** Every flag is a suggestion for a human reviewer, not a definitive verdict — the model can misjudge context, especially in domain-specific notebooks, and scores can vary slightly between runs on the same notebook.
 - **Scoped to Jupyter notebooks only.** PlotHole currently only understands `.ipynb` structure and Python code cells; it doesn't support R notebooks, plain scripts, or other formats.
 - **Static analysis has real limits.** The `ast`-based variable tracker sees variable names, not runtime values — it can't detect issues that only show up dynamically (e.g., a variable reassigned inside a conditional branch that's never actually taken).
+- **"Print-and-discard" variables aren't always mechanically caught.** A variable referenced exactly once — even just to display it — technically counts as "used," so the mechanical dead-end detector can miss this pattern. The LLM sometimes catches it independently as orphaned exploration, but not reliably.
 - **Prompt sensitivity.** Flag accuracy depends on prompt tuning; it was validated against the notebooks in `test_notebooks/` and may need further iteration on very different notebook styles (e.g. heavily visualization-only notebooks, or ones with minimal markdown).
 
 ---
@@ -128,23 +143,24 @@ streamlit run app.py
 - **Additional detection types cut for time:**
   - **Unjustified pivots** — flagging when a notebook's analysis direction changes with no explanation for why.
   - **More nuanced scoring** — weighting flags by severity/type rather than a flat count, and normalizing better across notebook lengths.
+  - **Smarter dead-end detection** — catching "created → printed once → abandoned" patterns, not just zero-use variables.
 - **Richer frontend:** inline diff-style highlighting of the exact code/markdown causing a flag, rather than just cell-level pointers.
 
 ---
 
-## 9. Team
+## 9. Team — DataForge
 
-| Component | Owner |
-|---|---|
-| Parser & narrative graph (`parser/`) | Person 1 |
-| LLM analysis & scoring (`llm_analysis/`) | Person 2 |
-| Streamlit frontend | Person 3 |
-| Documentation | — |
+| Component | Owner | GitHub |
+|---|---|---|
+| Parser, narrative graph & live demo(`parser/`) | Ayushi Rai | [@mysticalayushi](https://github.com/mysticalayushi) |
+| LLM analysis & scoring (`llm_analysis/`) | Harshit Mishra | [@harshitmishra-dev](https://github.com/harshitmishra-dev) |
+| Streamlit frontend (`frontend/`) | Kalash Sharma| [@Kalash-here](https://github.com/Kalash-here) |
+| Documentation, testing & submission | Gunjan Sharma | [gunzzzz04](https://github.com/gunzzzz04) |
 
 ---
 
 ## 10. Links
 
-- **GitHub repo:** https://github.com/mysticalayushi/PlotHole
+- **GitHub repo:** https://github.com/mysticalayushi/plothole
 - **Working demo:** _add link_
-- **YouTube video:** _add link
+- **YouTube video:** _add link_
