@@ -253,7 +253,7 @@ This spread is intentional: PlotHole is calibrated to avoid false positives. A n
 - **LLM judgment isn't ground truth.** Flags are best treated as suggestions for human review, not a definitive verdict — the model can occasionally be too strict or too lenient.
 - **Notebook-only scope.** The current detection pipeline is built specifically around `.ipynb` structure and doesn't generalize to other artifact types out of the box (see Future Scope below).
 - **"Print-and-discard" variables aren't always mechanically caught.** A variable referenced exactly once (e.g. just to display it) technically has a "use," even if that use is just a throwaway print — this is a known gap in the current dead-end detector.
-- **Requires an Anthropic API key** with available credits to run the real LLM analysis layer.
+- **Requires an API key** with available credits to run the real LLM analysis layer.
 
 ---
 
