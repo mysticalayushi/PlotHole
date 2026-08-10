@@ -447,7 +447,7 @@ st.markdown(
           <span class="ph-badge">📄 MIT License</span>
         </div>
       </div>
-      {HERO_ART_SVG}
+      {HERO_ART_SVG.strip()}
     </div>
     """,
     unsafe_allow_html=True,
