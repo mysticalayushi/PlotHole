@@ -163,4 +163,5 @@ streamlit run frontend/app.py
 
 - **GitHub repo:** https://github.com/mysticalayushi/plothole
 - **Streamlit App:** https://plothole-gugzldxaqyagagapphyumvf.streamlit.app/
+- **Live Demo:** https://drive.google.com/file/d/1Nd648LLlvn1BsK_U7DJzMWIjOFyE89Rv/view
 - **YouTube video:** https://www.youtube.com/watch?v=8iAbv_e-Dr4

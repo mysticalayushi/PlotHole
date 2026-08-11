@@ -58,8 +58,8 @@ It parses any `.ipynb` file, reconstructs the notebook's variable flow using Pyt
 <div align="center">
 
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live%20App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://plothole-gugzldxaqyagagapphyumvf.streamlit.app/)
-[![Demo Video](https://img.shields.io/badge/YouTube-Watch%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=8iAbv_e-Dr4)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/mysticalayushi/plothole)
+[![Live Demo Video](https://img.shields.io/badge/Live%20Demo-View%20Demo-9B5DE5?style=for-the-badge&logo=play&logoColor=white)](https://drive.google.com/file/d/1Nd648LLlvn1BsK_U7DJzMWIjOFyE89Rv/view)
+[![Youtube Video](https://img.shields.io/badge/YouTube-Watch%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=8iAbv_e-Dr4)
 
 </div>
 
